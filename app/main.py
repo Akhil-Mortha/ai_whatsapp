@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+from fastapi import Request
+from app.services.whatsapp_service import handle_whatsapp
 from app.services.autogen_service import run_autogen
 from app.db_service import get_or_create_user, save_message, get_messages
 
@@ -56,4 +57,8 @@ def chat(req: ChatRequest):
 @app.get("/history/{user_id}")
 def history(user_id: str):
     return get_messages(user_id)
+
+@app.post("/whatsapp")
+async def whatsapp_webhook(request: Request):
+    return await handle_whatsapp(request)
 
