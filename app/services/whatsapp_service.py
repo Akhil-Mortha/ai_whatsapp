@@ -3,7 +3,7 @@ from fastapi.responses import Response
 from twilio.rest import Client
 
 from app.agents.orchestrator import orchestrator
-from app.services.db_service import get_or_create_user
+from app.db_service import get_or_create_user
 from app.config import (
     TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN,
