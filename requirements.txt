@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+groq
+twilio
+requests
+python-multipart
+pinecone
+streamlit
+pyautogen
