@@ -64,6 +64,7 @@ async def process_message(message, user_id):
 # =========================================
 # 📲 WHATSAPP WEBHOOK (TWILIO)
 # =========================================
+
 async def handle_whatsapp(request: Request):
     try:
         print("🔥 WhatsApp Webhook HIT")
@@ -73,35 +74,36 @@ async def handle_whatsapp(request: Request):
         incoming_msg = form.get("Body")
         user_id = form.get("From")
 
-        print(f"[USER]: {incoming_msg} from {user_id}")
+        print("📩 Incoming:", incoming_msg)
+        print("👤 User:", user_id)
 
-        # ✅ Ensure format
+        if not incoming_msg or not user_id:
+            return Response(content="<Response></Response>", media_type="application/xml")
+
         if not user_id.startswith("whatsapp:"):
             user_id = f"whatsapp:{user_id}"
 
-        # ✅ Create user
         get_or_create_user(user_id)
 
-        # 🧠 Get AI reply
-        reply = orchestrator(user_id, incoming_msg)
+        # ✅ SAFE CALL
+        try:
+            reply = orchestrator(user_id, incoming_msg)
+            if not reply:
+                reply = "⚠️ No response from AI"
+        except Exception as e:
+            print("❌ Orchestrator Error:", e)
+            reply = "❌ AI failed"
 
-        print(f"[BOT]: {reply}")
-
-        # ✅ Split long messages
         parts = split_message(reply)
 
-        # 📤 Send messages via Twilio
         for part in parts:
-            msg = client.messages.create(
+            client.messages.create(
                 body=part,
                 from_=TWILIO_WHATSAPP_NUMBER,
                 to=user_id
             )
-            print("✅ Sent:", msg.sid)
 
     except Exception as e:
         print("❌ WhatsApp Error:", e)
 
-    # ✅ Twilio requires XML response
     return Response(content="<Response></Response>", media_type="application/xml")
-
