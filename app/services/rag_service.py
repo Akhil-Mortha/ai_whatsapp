@@ -1,5 +1,6 @@
 from pinecone import Pinecone, ServerlessSpec
 from app.config import PINECONE_API_KEY
+from sentence_transformers import SentenceTransformer
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
@@ -19,9 +20,11 @@ if index_name not in pc.list_indexes().names():
 index = pc.Index(index_name)
 
 
-# 🔹 Lightweight embedding
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
 def simple_embedding(text):
-    return [float(ord(c)) for c in text[:384]] + [0.0] * (384 - len(text[:384]))
+    return model.encode(text).tolist()
+
 
 
 def store_message(user_id, message):

@@ -4,7 +4,7 @@ from fastapi import Request
 from app.services.whatsapp_service import handle_whatsapp
 from app.services.autogen_service import run_autogen
 from app.db_service import get_or_create_user, save_message, get_messages
-
+from app.agents.orchestrator import orchestrator
 app = FastAPI()
 
 
@@ -40,7 +40,12 @@ def chat(req: ChatRequest):
     history = get_messages(user_id)
 
     # 🤖 Generate AI response (Groq via AutoGen service)
-    reply = run_autogen(req.message, user_id)
+
+    reply = orchestrator(user_id, req.message)
+
+
+
+
 
     # 💾 Save assistant response
     save_message(user_id, "assistant", reply)
