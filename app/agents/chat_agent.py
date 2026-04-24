@@ -8,7 +8,7 @@ def chat_with_ai(user_id, message):
     messages = []
 
     for msg in past_context:
-        messages.append({"role": "assistant", "content": msg})
+        messages.append({"role": "user", "content": msg})
     messages.append({"role": "user", "content": message})
 
     response = generate_response_with_history(messages)

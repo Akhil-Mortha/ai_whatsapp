@@ -13,16 +13,29 @@ client = Groq(api_key=api_key)
 
 
 def generate_response_with_history(messages):
-    try:
-        response = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=messages,
-            temperature=0.7,
-            max_tokens=300
-        )
+    import time
 
-        return response.choices[0].message.content
+    for attempt in range(3):
+        try:
+            print(f"🔁 LLM attempt {attempt+1}")
 
-    except Exception as e:
-        print("❌ Groq Error:", e)
-        return "AI error occurred ❌"
+            response = client.chat.completions.create(
+                model="llama3-8b-8192", # ✅ more stable model
+                messages=messages,
+                temperature=0.7,
+                max_tokens=300
+            )
+
+            content = response.choices[0].message.content
+
+            if content:
+                print("✅ LLM Success")
+                return content
+
+        except Exception as e:
+            print(f"❌ Groq Error (attempt {attempt+1}):", e)
+            time.sleep(1)
+
+    # ✅ FINAL FALLBACK (VERY IMPORTANT)
+    return "🤖 I'm facing a temporary issue, please try again."
+
